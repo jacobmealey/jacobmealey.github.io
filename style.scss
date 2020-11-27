@@ -101,6 +101,14 @@ H2.section-link{
 }
 
 .social-media{
-    width:50px;
-    padding-right:20px;
+    transition: .05s;
+    border-radius: 45%;;
+}
+img.social-media{
+  @extend .social-media;
+  width: 50px;
+}
+.social-media:hover{
+    transform:scale(1.05);
+    background-color: #ffff89;
 }
