@@ -40,27 +40,27 @@ div.lightbulb {
   display: flex;
   flex-direction: row;
   width: 60%;
-  transform: translateY(-80px);
+  transform: translateY(-29px);
 }
 
 img.lightbulb1 {
-  transform: translateY(-71px);
+  transform: translateY(-49px);
 }
 
 img.lightbulb2 {
-  transform: translateY(-38px);
+  transform: translateY(-41px);
 }
 
 img.lightbulb3 {
-  transform: translateY(-73px);
+  transform: translateY(-28px);
 }
 
 img.lightbulb4 {
-  transform: translateY(-12px);
+  transform: translateY(-65px);
 }
 
 img.lightbulb5 {
-  transform: translateY(-2px);
+  transform: translateY(-11px);
 }
 
 H1, H2, H3, H4, H5 {
@@ -97,16 +97,25 @@ H2.section-link {
   border-bottom: 5px solid #ffff89;
 }
 
+.social-media-container {
+  display: flex;
+  flex-direction: row;
+}
+
 .social-media, img.social-media {
   transition: 0.05s;
   border-radius: 45%;
+}
+
+div.social-media {
+  padding-left: 10px;
 }
 
 img.social-media {
   width: 50px;
 }
 
-.social-media:hover {
+img.social-media:hover {
   transform: scale(1.05);
   background-color: #ffff89;
 }
