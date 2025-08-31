@@ -2,7 +2,17 @@ html, body {
   height: 100%;
   width: 100%;
   margin: 0px;
-  /* font-family: "Raleway"; */
+  background-color: #ffffff;
+  color: #000000;
+/* font-family: "Raleway"; */
+}
+
+/* Dark mode styles, applied when system prefers dark scheme */
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: black;
+        color: white;
+    }
 }
 
 .section_link {
@@ -24,7 +34,9 @@ html, body {
   height: 30%;
   padding-left: 2%;
   padding-right: 2%;
+  color: #000000;
 }
+
 
 .header-text {
   padding-top: 2%;
@@ -35,7 +47,7 @@ html, body {
   transition: 0.1s;
 }
 
-div.lightbulb {
+picture.lightbulb {
   height: 100%;
   display: flex;
   flex-direction: row;
@@ -69,8 +81,14 @@ H1, H2, H3, H4, H5 {
   color: black;
 }
 
+
 H1 {
   font-size: 50px;
+}
+@media (prefers-color-scheme: dark) {
+  H1, H2, H3, H4, H5, p {
+      color: white;
+  }
 }
 
 p {
