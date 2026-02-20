@@ -1,0 +1,602 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-02-19 Thu 19:24 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Writing Good Shell Scripts</title>
+<meta name="author" content="Jacob Mealey" />
+<meta name="generator" content="Org Mode" />
+<style type="text/css">
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">Writing Good Shell Scripts</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org45c0009">1. Writing good shell scripts&#xa0;&#xa0;&#xa0;<span class="tag"><span class="shell">shell</span>&#xa0;<span class="presentation">presentation</span></span></a>
+<ul>
+<li><a href="#org2796925">1.1. Why shell scripts?</a></li>
+<li><a href="#org59ca257">1.2. Bashisms and the POSIX shell</a></li>
+<li><a href="#org8853c10">1.3. Avoiding footguns</a>
+<ul>
+<li><a href="#orgbeecd03">1.3.1. <code>set -e</code> or error on failure.</a></li>
+<li><a href="#org78b252f">1.3.2. <code>set -u</code> or undefined variables</a></li>
+<li><a href="#orgc5f90c9">1.3.3. <code>set -o pipefail</code> or not hiding errors</a></li>
+<li><a href="#orgcb49c7d">1.3.4. Put it all together</a></li>
+</ul>
+</li>
+<li><a href="#org4869af1">1.4. Using <code>trap</code></a></li>
+<li><a href="#org1a0dfd2">1.5. Treat it like a <i>real</i> programming language (with love ❤)</a>
+<ul>
+<li><a href="#org96d4062">1.5.1. Use functions</a></li>
+<li><a href="#org29e30bd">1.5.2. Parse arguments well and have a help function</a></li>
+<li><a href="#org27e4220">1.5.3. Know and understand the various substitutions available.</a></li>
+</ul>
+</li>
+<li><a href="#org41f5c24">1.6. My preferences in shell scripting</a>
+<ul>
+<li><a href="#orga4c1cdc">1.6.1. Use short-circuiting logic instead of if/else</a></li>
+<li><a href="#orgbea100e">1.6.2. Pipes at the start of the line</a></li>
+</ul>
+</li>
+<li><a href="#org39bb760">1.7. Use Shellcheck</a></li>
+<li><a href="#orgca0c66e">1.8. Further reading</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org45c0009" class="outline-2">
+<h2 id="org45c0009"><span class="section-number-2">1.</span> Writing good shell scripts&#xa0;&#xa0;&#xa0;<span class="tag"><span class="shell">shell</span>&#xa0;<span class="presentation">presentation</span></span></h2>
+<div class="outline-text-2" id="text-1">
+</div>
+<div id="outline-container-org2796925" class="outline-3">
+<h3 id="org2796925"><span class="section-number-3">1.1.</span> Why shell scripts?</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+I&rsquo;m going to be honest, I can&rsquo;t explain why writing shell scripts is
+useful, and why using good practices in shell scripts even better but
+I suspect if you are reading this then are aware of the benefits.
+</p>
+</div>
+</div>
+<div id="outline-container-org59ca257" class="outline-3">
+<h3 id="org59ca257"><span class="section-number-3">1.2.</span> Bashisms and the POSIX shell</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+There are some bashisms to be aware of. <code>/bin/sh</code> is not bash. Bash is a
+superset. I know we have talked about this but I have to mention it.
+</p>
+
+<ul class="org-ul">
+<li>there is no <code>function</code> keyword in <code>/bin/sh</code></li>
+<li>There are no arrays&#x2026;</li>
+<li>Just because two shells are standard compliant, doesn&rsquo;t mean they will
+behave the same</li>
+<li>Bash in POSIX mode only guarantees POSIX code will work. It may not error
+when seeing Bash only syntax.</li>
+<li>The only way to know if your script is portable is to test it on another
+system</li>
+</ul>
+
+<p>
+see more here: <a href="https://mywiki.wooledge.org/Bashism">https://mywiki.wooledge.org/Bashism</a>
+</p>
+</div>
+</div>
+<div id="outline-container-org8853c10" class="outline-3">
+<h3 id="org8853c10"><span class="section-number-3">1.3.</span> Avoiding footguns</h3>
+<div class="outline-text-3" id="text-1-3">
+<p>
+The shell is dated, and like much software from the 70s and 80s it assumes
+you the author are doing your due-diligence. This manifests in some strange
+ways, mostly around missing errors you wouldn&rsquo;t expect. We can enable flags
+in our shell to make it stricter.
+</p>
+</div>
+<div id="outline-container-orgbeecd03" class="outline-4">
+<h4 id="orgbeecd03"><span class="section-number-4">1.3.1.</span> <code>set -e</code> or error on failure.</h4>
+<div class="outline-text-4" id="text-1-3-1">
+<p>
+<code>set -e</code> is the first flag, which simply terminates the shell script if any
+command returns non-zero (remember zero means success in the shell). If you
+expect a command might fail and want to handle it manually you still can:
+</p>
+<div class="org-src-container">
+<pre class="src src-nil">do-something || {
+    do-some-prep
+    do-something
+}
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org78b252f" class="outline-4">
+<h4 id="org78b252f"><span class="section-number-4">1.3.2.</span> <code>set -u</code> or undefined variables</h4>
+<div class="outline-text-4" id="text-1-3-2">
+<p>
+Traditionally if you try to access a variable which does exist, the shell
+will provide an empty string. this <i>might</i> be what you want to happen but
+most likely you are expecting a variable to be set. <code>set -u</code> instructs the
+shell to treat the access of undefined variables as an error.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc5f90c9" class="outline-4">
+<h4 id="orgc5f90c9"><span class="section-number-4">1.3.3.</span> <code>set -o pipefail</code> or not hiding errors</h4>
+<div class="outline-text-4" id="text-1-3-3">
+<p>
+Say you have a string of commands <code>foo | bar | baz</code>, this will only &ldquo;error&rdquo;
+if <code>baz</code> returns a non-zero value. This means that <code>foo</code> or <code>bar</code> could fail
+and this would be silent, even with <code>set -e</code>. <code>set -o pipefail</code> ensures that
+if any command in a pipeline fails, the whole pipeline is marked as an error
+which can be bubbled up and handled.
+</p>
+</div>
+</div>
+<div id="outline-container-orgcb49c7d" class="outline-4">
+<h4 id="orgcb49c7d"><span class="section-number-4">1.3.4.</span> Put it all together</h4>
+<div class="outline-text-4" id="text-1-3-4">
+<p>
+We can put a single line at the top of our script: <code>set -euo pipefail</code>  to
+ensure all of these get set.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org4869af1" class="outline-3">
+<h3 id="org4869af1"><span class="section-number-3">1.4.</span> Using <code>trap</code></h3>
+<div class="outline-text-3" id="text-1-4">
+<p>
+intercepting signals is helpful, perhaps you want to log some telemetry, or at
+the very least have some consistent error messages for your user. This can be
+done very easily with <code>trap</code>.
+</p>
+<div class="org-src-container">
+<pre class="src src-nil"># The following function will get run if we error
+handler() {
+   echo "We ran into an error, call 207-876-5309 to report the issue"
+}
+trap handler ERR
+</pre>
+</div>
+
+<p>
+If you want to use some bashisms, you can use <code>$BASH_LINENO</code> and <code>$BASH_COMMAND</code>
+</p>
+</div>
+</div>
+<div id="outline-container-org1a0dfd2" class="outline-3">
+<h3 id="org1a0dfd2"><span class="section-number-3">1.5.</span> Treat it like a <i>real</i> programming language (with love ❤)</h3>
+<div class="outline-text-3" id="text-1-5">
+</div>
+<div id="outline-container-org96d4062" class="outline-4">
+<h4 id="org96d4062"><span class="section-number-4">1.5.1.</span> Use functions</h4>
+<div class="outline-text-4" id="text-1-5-1">
+<p>
+It&rsquo;s very easy to write a shell script simply as a list of commands we want to
+run. This can be true, but it can also obfuscate the structure of what we want
+to do. Suppose you are writing a script to scrape images from a website, and it
+you have thread broad steps: collection, processing, and naming. Each of these
+steps may consist of a large (and varying) number of commands, along with some
+setup for what we&rsquo;re scraping and where to store things etc. It may feel easy
+to just dump all of the commands in a file in a row, maybe you add some comments
+saying which part is doing what maybe not.
+</p>
+
+<p>
+But I would suggest that it takes &lt; 5 more minutes to put each section into some
+well named functions:
+</p>
+<div class="org-src-container">
+<pre class="src src-nil">collect_images() {
+  ...
+  curl "$img" &gt; "${TMPDIR}/${img}"
+  ...
+}
+
+process_images() {
+  ...
+  convert "${TMPDIR}/${img}" -resize 1000x1000 "${PROCESS_DIR}/${img}"
+  ...
+}
+
+organize_images() {
+  ...
+  find "${PROCESS_DIR}/" -exec ....
+  ...
+}
+
+collect_images
+process_images
+organize_images
+
+</pre>
+</div>
+
+<p>
+This allows the reader (probably you in a few months) to be able to at glance
+know what the chunk of code they are looking at is intended to do. So if you
+know the program is failing to organize images  for some reason, you can easily
+jump to that part and avoid sifting through the code to find the organization
+section.
+</p>
+</div>
+</div>
+<div id="outline-container-org29e30bd" class="outline-4">
+<h4 id="org29e30bd"><span class="section-number-4">1.5.2.</span> Parse arguments well and have a help function</h4>
+<div class="outline-text-4" id="text-1-5-2">
+<p>
+There is nothing more frustrating then trying to use a script and having it
+provide a cryptic shell error because the script is trying to use a parameter
+I didn&rsquo;t pass, or I passed wrong. To parse arguments well, I prefer using using
+a while loop, <code>case</code> and <code>shift</code>. It can be verbose but it&rsquo;s the most robust
+way to handle it in the shell.
+</p>
+<div class="org-src-container">
+<pre class="src src-nil">usage() {
+  echo "foo.sh"
+  echo "Options"
+  echo "-o,--output [file]  set some output"
+  echo "-d,--dryrun         show what would happen"
+  echo "-h,--help           show this help message"
+}
+while [ "$#"" -gt 0 ]; do
+  case "$1" in
+    -d|--dryrun)
+      dryrun=1
+      shift
+      ;;
+    -o|--output)
+      if [ -z "$2" ]; then
+        echo "Error: $1 expects a file!"
+        exit 1
+      fi
+      output="$2"
+      shift 2 # Note we shift by 2 here!
+      ;;
+    -h|--help)
+      usage
+      ;;
+    *)
+     echo "Unexpected argument $1"
+     usage
+     ;;
+  esac
+done
+</pre>
+</div>
+
+<p>
+The case syntax is awkward, but I&rsquo;ve found this to be the most robust way handle parsing arguments
+for complicated scripts
+</p>
+</div>
+</div>
+<div id="outline-container-org27e4220" class="outline-4">
+<h4 id="org27e4220"><span class="section-number-4">1.5.3.</span> Know and understand the various substitutions available.</h4>
+<div class="outline-text-4" id="text-1-5-3">
+<p>
+There are many parameter expansions in the posix shell, a good one to know is the <i>use default
+value</i> substitution. To show this in action lets look at a function which takes an optional
+parameter, a naive approach may be:
+</p>
+<div class="org-src-container">
+<pre class="src src-nil">say_hi_to() {
+  if [ -z "$1" ]; then
+     name="$1"
+  else
+     name="John Doe"
+  fi
+  echo "Hi $name"
+}
+say_hi_to chris # prints 'Hi chris'
+say_hi_to       # prints 'Hi John Doe'
+</pre>
+</div>
+<p>
+But we can reduce this to a single line using the parameter expansion system:
+</p>
+<div class="org-src-container">
+<pre class="src src-nil">say_hi_to() {
+  echo "Hi ${1:-John Doe}"
+}
+</pre>
+</div>
+<p>
+see the spec for more info: <a href="https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_06_02">https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_06_02</a>
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org41f5c24" class="outline-3">
+<h3 id="org41f5c24"><span class="section-number-3">1.6.</span> My preferences in shell scripting</h3>
+<div class="outline-text-3" id="text-1-6">
+<p>
+Below are some of preferences for writing shell scripts, these are mostly nitpick things,
+feel free to disagree as they are mostly cosmetic.
+</p>
+</div>
+<div id="outline-container-orga4c1cdc" class="outline-4">
+<h4 id="orga4c1cdc"><span class="section-number-4">1.6.1.</span> Use short-circuiting logic instead of if/else</h4>
+<div class="outline-text-4" id="text-1-6-1">
+<p>
+instead of doing
+</p>
+<div class="org-src-container">
+<pre class="src src-nil">if ! some_command; then
+  handle_it
+fi
+</pre>
+</div>
+<p>
+I tend to prefer
+</p>
+<div class="org-src-container">
+<pre class="src src-nil">some_command || handle_it
+</pre>
+</div>
+<p>
+You may also use a block of commands in the second half as well:
+</p>
+<div class="org-src-container">
+<pre class="src src-nil">some_command || {
+  first_handler
+  second_handler
+}
+</pre>
+</div>
+<p>
+I find this less visually noisy then the <code>if ...; then ... fi</code> syntax.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbea100e" class="outline-4">
+<h4 id="orgbea100e"><span class="section-number-4">1.6.2.</span> Pipes at the start of the line</h4>
+<div class="outline-text-4" id="text-1-6-2">
+<p>
+For long pipelines it can be nice to break it up onto multiple lines. Most
+examples you see will have the pipes on the end of the line like so:
+</p>
+<div class="org-src-container">
+<pre class="src src-nil">some_command | \
+  foo | \
+  bar -x -y | \
+  baz --whack |
+</pre>
+</div>
+<p>
+I prefer the following form better:
+</p>
+<div class="org-src-container">
+<pre class="src src-nil">some_command \
+| foo        \
+| bar -x -y  \
+| baz --whack
+</pre>
+</div>
+<p>
+Note, I&rsquo;ve also aligned the backslash&rsquo;s. I like things being aligned. I also
+like the pipes at the beginning of the line because it makes me feel like a cool
+Haskell programmer (which I am not)! Also rust match statements with many options
+also look like this, so maybe that&rsquo;s why I like it.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org39bb760" class="outline-3">
+<h3 id="org39bb760"><span class="section-number-3">1.7.</span> Use Shellcheck</h3>
+<div class="outline-text-3" id="text-1-7">
+<p>
+Shellcheck (<a href="https://www.shellcheck.net/">https://www.shellcheck.net/</a>) is a lovely tool written in Haskell to parse and lint shell scripts
+for common issues,
+</p>
+</div>
+</div>
+<div id="outline-container-orgca0c66e" class="outline-3">
+<h3 id="orgca0c66e"><span class="section-number-3">1.8.</span> Further reading</h3>
+<div class="outline-text-3" id="text-1-8">
+<ul class="org-ul">
+<li>The Advanced Bash Scripting Guide: <a href="https://tldp.org/LDP/abs/html/">https://tldp.org/LDP/abs/html/</a></li>
+<li>IEEE Std 1003.1-2017 (POSIX spec for the Shell Command Language) <a href="https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html">https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html</a></li>
+<li>POSIX shell scripting guide: <a href="https://github.com/cloudstreet-dev/POSIX-Shell-Scripting/tree/main">https://github.com/cloudstreet-dev/POSIX-Shell-Scripting/tree/main</a></li>
+<li><code>man dash</code>, <code>man bash</code></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author: Jacob Mealey</p>
+<p class="date">Created: 2026-02-19 Thu 19:24</p>
+</div>
+</body>
+</html>

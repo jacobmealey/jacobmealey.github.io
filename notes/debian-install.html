@@ -200,89 +200,52 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org74b7932">1. Repacking debian tarballs&#xa0;&#xa0;&#xa0;<span class="tag"><span class="debian">debian</span>&#xa0;<span class="packaging">packaging</span></span></a></li>
-<li><a href="#org4a87dbb">2. Better Lintian</a></li>
-<li><a href="#org8b13a16">3. Uploading packages</a></li>
+<li><a href="#org95e9911">1. Font Rendering</a></li>
+<li><a href="#org3156ac8">2. Battery stuff</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org74b7932" class="outline-2">
-<h2 id="org74b7932"><span class="section-number-2">1.</span> Repacking debian tarballs&#xa0;&#xa0;&#xa0;<span class="tag"><span class="debian">debian</span>&#xa0;<span class="packaging">packaging</span></span></h2>
+<div id="outline-container-org95e9911" class="outline-2">
+<h2 id="org95e9911"><span class="section-number-2">1.</span> Font Rendering</h2>
 <div class="outline-text-2" id="text-1">
 <p>
-First to repack an upstream, you have to modify the copywrite file to add an exclude
-the files you want. For starfetch it looks like:
+You can make the terminal font much clearer by running
 </p>
 <div class="org-src-container">
-<pre class="src src-nil">Files-Excluded:
-    src/include
+<pre class="src src-nil">sudo dpkg-reconfigure console-setup
 </pre>
 </div>
 
-<p>
-Then you can use uscan to generate the tarball
-</p>
-<div class="org-src-container">
-<pre class="src src-nil">uscan --repack --force-download
-</pre>
-</div>
 
 <p>
-Then you need to use <code>pristine-tarball</code> to commit to get it in the source. I don&rsquo;t
-understand how this fits into <code>gbp import</code> though&#x2026;
+And you can run the following and make the font rendering on LCDs much clearer.
+I don&rsquo;t <i>think</i> it&rsquo;s a placebo.
 </p>
+
+<div class="org-src-container">
+<pre class="src src-nil">dpkg-reconfigure fontconfig-config
+</pre>
+</div>
+<p>
+I have been liking:
+</p>
+<ul class="org-ul">
+<li>Native font tuning</li>
+<li>Full font hinting</li>
+<li>Always have subpixel rendering</li>
+<li>No bitmapping</li>
+</ul>
 </div>
 </div>
-<div id="outline-container-org4a87dbb" class="outline-2">
-<h2 id="org4a87dbb"><span class="section-number-2">2.</span> Better Lintian</h2>
+<div id="outline-container-org3156ac8" class="outline-2">
+<h2 id="org3156ac8"><span class="section-number-2">2.</span> Battery stuff</h2>
 <div class="outline-text-2" id="text-2">
 <p>
-Andrew Bower showed me how to see all the lintian things the Debian CI systems use:
+Powertop is a good tool (atleast on x86 machines).
 </p>
 <div class="org-src-container">
-<pre class="src src-nil">lintian -v -i -I -E --pedantic --show-overrides --profile debian ../package.deb
-</pre>
-</div>
-</div>
-</div>
-<div id="outline-container-org8b13a16" class="outline-2">
-<h2 id="org8b13a16"><span class="section-number-2">3.</span> Uploading packages</h2>
-<div class="outline-text-2" id="text-3">
-<p>
-First you need to build the package as a source package like so
-</p>
-<div class="org-src-container">
-<pre class="src src-nil">gbp buildpackage --git-builder='sbuild -s'
-</pre>
-</div>
-
-<p>
-Next, you need to sign. Technically dput should sign things for you, but I have
-middling success so I sign seperately
-</p>
-<div class="org-src-container">
-<pre class="src src-nil">debsign ../starfetch_0.0.4-1_arm64.changes
-</pre>
-</div>
-
-<p>
-the <code>.changes</code> file should have all six entries (obviously different hashes and what not)
-</p>
-<div class="org-src-container">
-<pre class="src src-nil"> 5ed96c71bcb4a6dc5b21b561cde6266471d90799bbde571381ac1d133b5cf10e 1916 starfetch_0.0.4-1.dsc
- fa343cfc2f6220f47353a175e6bcd9ca117486123c70142e9891313089912633 118976 starfetch_0.0.4.orig.tar.xz
- 589e6a7b384e2c06b71c792c3159bbbeef84c03793f8e833efd6df7fb055a5d8 3244 starfetch_0.0.4-1.debian.tar.xz
- 69f55ec6d5ae0b582ad57011308b61683f3f081bb8541172e22ae161282e4261 1101628 starfetch-dbgsym_0.0.4-1_arm64.deb
- 61d00b62fa6f422ea4a00f915668ad142c8194e62a755f6e513ec87b4bfada3d 6137 starfetch_0.0.4-1_arm64.buildinfo
- 8d42330ea3c9e128eecfeb6a7929878cf34c059c7a98f8055c31d8ec9b8aef36 74468 starfetch_0.0.4-1_arm64.deb
-</pre>
-</div>
-
-<p>
-Then finally, upload to mentors.debian.net
-</p>
-<div class="org-src-container">
-<pre class="src src-nil">dput mentors
+<pre class="src src-nil">apt install powertop
+systemctl enable powertop &amp;&amp; systemctl start powertop
 </pre>
 </div>
 </div>
